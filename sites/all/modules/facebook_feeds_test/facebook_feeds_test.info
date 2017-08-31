@@ -1,0 +1,5 @@
+name = facebook_feeds_test
+description = "Provides facebook feeds."
+core = 7.x
+stylesheets[all][] = facebook_feeds.css
+

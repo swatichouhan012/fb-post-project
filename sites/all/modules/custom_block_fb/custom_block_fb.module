@@ -1,0 +1,36 @@
+<?php
+/**
+* Implements hook_block_info().
+*/
+function custom_block_fb_block_info() {
+  $blocks = array();
+
+  $blocks['facebook_wall'] = array(
+    'info' => t('Facebook Wall'),
+  );
+
+  return $blocks;
+}
+
+/**
+* Implements hook_block_view().
+*/
+
+
+function custom_block_fb_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'facebook_wall':
+      $block['subject'] = '';
+      $block['content'] = _YOUR_MODULE_BLOCK_ABC_CONTENT();
+      break;
+  }
+
+  return $block;
+}
+
+function _YOUR_MODULE_BLOCK_ABC_CONTENT() {
+  $output = t('Hello world');
+  return $output;
+}

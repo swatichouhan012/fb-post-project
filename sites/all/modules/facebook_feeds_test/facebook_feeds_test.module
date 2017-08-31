@@ -1,0 +1,231 @@
+<?php
+
+function time_ago($date) {
+    if (empty($date)) {
+        return "No date provided";
+    }
+    $periods = array("second", "minute", "hour", "day", "week", "month", "year", "decade");
+    $lengths = array("60", "60", "24", "7", "4.35", "12", "10");
+    $now = time();
+    $unix_date = strtotime($date);
+// check validity of date
+    if (empty($unix_date)) {
+        return "Bad date";
+    }
+// is it future date or past date
+    if ($now > $unix_date) {
+        $difference = $now - $unix_date;
+        $tense = "ago";
+    } else {
+        $difference = $unix_date - $now;
+        $tense = "from now";
+    }
+    for ($j = 0; $difference >= $lengths[$j] && $j < count($lengths) - 1; $j++) {
+        $difference /= $lengths[$j];
+    }
+    $difference = round($difference);
+    if ($difference != 1) {
+        $periods[$j].= "s";
+    }
+    return "$difference $periods[$j] {$tense}";
+}
+
+function facebook_feed() {
+	// include the facebook sdk
+	require_once('facebook.php');
+
+	// connect to app
+	$config = array();
+	$config['appId'] = '1945037475766921';
+	$config['secret'] = '3a8157f0ff26a55e0288021f4877ba97';
+	$config['fileUpload'] = false; // optional
+
+	// instantiate
+	$facebook = new Facebook($config);
+
+	// set page id
+	$pageid = "100812416097";
+
+	// now we can access various parts of the graph, starting with the feed
+	$pagefeed = $facebook->api("/" . $pageid . "/feed?&fields=picture,message,id,created_time");
+	
+	$count = 0;
+	//echo '<div class="gray-part-content"><a href="#backtop" id="backtotop" class="jquery-once-2-processed" >Back to top</a><div class="container"><div class="events-section">';
+
+//$i=0;
+$json_link = "https://graph.facebook.com/100812416097/feed?access_token=1945037475766921|NFmkFpF1O4mS7655ofY_6s_Pdkg&fields=from,picture,message,id,created_time,link";
+$json = file_get_contents($json_link);
+
+$obj = json_decode($json, true, 512, JSON_BIGINT_AS_STRING);
+$i=1;
+
+echo "<div class='facebook-wraper'>";
+foreach($obj['data'] as $result)
+{
+	if($i<= 5){
+	//$final_picture = $result['picture'];
+	//$final_message = $result['message'];
+	$final_time = $result['created_time'];
+	if(!empty($result['message']))
+	{
+	$post_date = time_ago($final_time);
+	echo "<div class='facebook-block'>";
+	//~ print_r($result['name']);
+	//~ echo "<br/>";
+	if(!empty($result['picture']))
+	{
+	echo "<div class='facebook-image'>";
+	print_r("<img src=".$result['picture']." />");
+	echo "</div>";
+}
+	echo "<div class='facebook-content'>";
+	print_r("  ".$result['from']['name']. " posted " .$post_date. "  ");
+	echo "<br/>";
+	echo "<br/>";
+	print_r($result['message']);
+	echo "<br/>";
+	//~ print_r(time_ago($final_time));
+	//~ echo "<br/>";
+	print_r("<a target='_blank' href = ".$result['link'].">Read-More</a>");
+	echo "<br/>";
+	echo "<br/>";
+	echo "</div>";
+	echo "</div>";
+	
+	
+}
+	$i++;
+}
+}
+echo "</div>";
+	/*foreach($pagefeed['data'] as $post) {
+		$postIdStr = $obj['data'][$i]['id'];
+		
+		$postdataId = explode("_", $postIdStr);
+		$fbPostId = $postdataId[1];
+		$postLink = 'https://www.facebook.com/Newtech/posts/'.$fbPostId;
+		$desc = $obj;
+		
+		echo "<div class='parent_box_media'>";
+		if(!empty($obj['data'][$i]['picture']))
+		{
+			$desc = $obj['data'][$i]['picture'];
+			print_r ("<div class='box'><a target='_blank' href = ".$postLink."><img src=".$obj['data'][$i]['picture']." /></a></div>");
+			
+		}
+
+		if(!empty($obj['data'][$i]['description'])){
+			echo "<div class='media'>";
+			echo "<span class='fbtext'><a target='_blank' href = ".$postLink.">" . date("jS M, Y", (strtotime($post['created_time']))) . "</a></span>";
+			$string=$obj['data'][$i]['description'];
+
+			if (strlen($string) > 300) {
+				$stringCut = substr($string, 0, 300);
+				$string = substr($stringCut, 0, strrpos($stringCut, ' ')).'...  <a href="'.$postLink.'" target="_blank">Read More</a>'; 
+			}
+			echo "<p class='fbtext'><a target='_blank' href = ".$postLink.">".$string."</a></p>";
+			echo "</div>";
+
+		}
+	
+		else{
+			
+			echo "<div class='media'>";
+			echo "<span class='fbtext'><a target='_blank' href = ".$postLink.">" . date("jS M, Y", (strtotime($post['created_time']))) . "</a></span>";
+			$name=$obj['data'][$i]['message'];
+						
+				if (strlen($name) > 300)
+				{
+					$stringCut = substr($name, 0, 300);
+					$name = substr($stringCut, 0, strrpos($stringCut, ' ')).'...  <a href="'.$postLink.'" target="_blank">Read More</a>';
+					
+				}
+			echo "<p class='fbtext'><a target='_blank' href = ".$postLink.">".$name."</a></p>";
+			echo "kkkk";
+			echo "</div>";
+        
+		} 
+
+	echo "</div>";
+
+	/*}*/
+
+
+	/* if($i==1){
+	echo "<div class='parent_box_media'>";
+	if(!empty($obj['data'][$i]['picture'])){
+	print_r ("<div class='box'><a href = ".$postLink."><img src=".$obj['data'][$i]['picture']." /></a></div>");
+	}
+
+
+
+	if(!empty($obj['data'][$i]['description'])){
+
+	echo "<div class='media'>";
+	echo "<span class='fbtext'><a href = ".$postLink.">" . date("jS M, Y", (strtotime($post['created_time']))) . "</a></span>";
+	$string=$obj['data'][$i]['description'];
+	if (strlen($string) > 300) {
+	$stringCut = substr($string, 0, 300);
+	$string = substr($stringCut, 0, strrpos($stringCut, ' ')).'...  <a href="'.$postLink.'" target="_blank">Read More</a>'; 
+	}
+	echo "<p class='fbtext'><a href = ".$postLink.">".$string."</a></p>";
+	echo "</div>";
+
+	}
+	echo "</div>";
+	}*/
+
+
+	/*$i++;
+	
+	$count++;
+	if ($count == 1)
+	break;  
+	}*/
+
+           
+//~ $json_link_insta = "https://api.instagram.com/v1/tags/milanodesignweek2016/media/recent?access_token=2839712986.52c805a.69583669970244fc8276e9e9b1391a2b";
+//~ $json_insta = file_get_contents($json_link_insta);
+//~ 
+//~ 
+//~ $obj_insta = json_decode($json_insta, true);
+
+//$count =0;
+//~ foreach($obj_insta['data'] as $item){
+         //~ $postLink_insta = $item['link'];
+        //~ $image_insta = $item['images']['thumbnail']['url'];
+             //~ $timestamp = $item['created_time'];
+//~ $created_time =  gmdate("jS M, Y", $timestamp);
+   //~ 
+                 //~ echo "<div class='parent_box_media'>";
+				//~ if(!empty($image_insta))
+				//~ {
+                //~ echo '<div class="box"><a target="_blank" href = "'.$postLink_insta.' "><img src="'.$image_insta.'" /></a></div>';
+               //~ }
+              //~ 
+               //~ 
+               //~ if(!empty($item['created_time'])){
+				   //~ echo "<div class='media'>";
+				 //~ echo "<span class='fbtext'><a target='_blank' href = ".$postLink_insta.">" . $created_time . "</a></span>";
+					 //~ $string=$item['location']['name'];
+					//~ echo "<p class='fbtext'><a target='_blank' href = ".$postLink_insta.">".$string."</a></p>";
+					 //~ echo "</div>";
+					//~ 
+					 //~ }
+					 //~ 
+					  //~ echo "</div>";
+          //~ 
+  //~ 
+    //~ 
+      //~ $count++;
+    //~ if ($count == 1)
+     //~ break;
+     //~ }        
+            //~ echo "</div></div></div>";				
+}
+
+//facebook_feed();
+
+?>
+
+

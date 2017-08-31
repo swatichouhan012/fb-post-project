@@ -1,0 +1,10 @@
+.facebook-image > img {
+    border: 1px solid #000;
+    padding: 2px;
+    width: 94%;
+}
+
+.facebook-wraper {
+    overflow-x: hidden;
+    height:300px;
+}
